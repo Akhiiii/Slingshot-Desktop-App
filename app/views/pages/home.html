@@ -1,0 +1,161 @@
+<!-- <div>
+    <div style="  position: relative;
+    top: 0;
+    left: 0;
+height:100vh; width:1920px;  background-image: url('../images/qualcomm_bg.jpg');background-repeat : repeat"></div>
+    <div style="height:20px; width:20px; padding:9px; background:url('../images/qualcomm_bg.jpg') repeat "></div>
+    <div id="feedback_div"></div>
+</div> -->
+<style>
+  .main_bg
+  {
+    position: relative;
+    top: 0;
+    left: 0;
+    width:1920;
+    height:100vh; 
+    background-image: url('../images/qualcomm_bg.jpg');
+    background-repeat : repeat;
+  }
+  .main_logo
+  {
+    position: absolute;
+    top: 2%;
+    left : 42.5%;
+    width:200px;
+  }
+</style>
+
+<div style="position: relative; left: 0; top: 0;height:100vh">
+  <div id="feedback_div" class="main_bg"></div>
+  <!-- <img src="images/logo.png" class="main_logo"/> -->
+</div>
+
+<script type="text/javascript">
+
+var screen_width = 1920;   // screen.width
+var screen_height = 1080;
+var divsize  = 200 * 1 ; //500
+
+
+
+var previous_list = [];
+var bg_images = ['images/splat_1.jpg','images/splat_2.png','images/splat_3.png','images/splat_4.png','images/splat_5.png'];
+var last_img_position = 0;
+
+
+var position_1 = [ [0,screen_width/2], [0,screen_height/2] ];
+var position_2 = [ [screen_width/2,screen_width], [0,screen_height/2] ];
+var position_3 = [ [0,screen_width/2], [screen_height/2,screen_height]];
+var position_4 = [ [screen_width/2,screen_width], [screen_height/2,screen_height] ];
+
+var last_grid_position = 1;
+
+setInterval(function() {
+
+  var remote = require('electron').remote;
+  var arr_list = remote.getGlobal('users_list');
+  if(arr_list.length !=0 && previous_list.length != arr_list.length){
+
+    previous_list = arr_list;
+    var last_obj = arr_list[arr_list.length-1];
+
+    if(last_grid_position==1){
+      last_grid_position = 2;
+    }else if(last_grid_position == 2){
+      last_grid_position = 3;
+    }else if(last_grid_position==3){
+      last_grid_position = 4;
+    }else if(last_grid_position==4){
+      last_grid_position = 1;
+    }
+
+    var grid = position_1;
+    if(last_grid_position==2){grid = position_2;}
+    else if(last_grid_position==3){grid = position_3;}
+    else if(last_grid_position==4){grid = position_4;}
+    console.log("grid---",grid)
+    var minx = grid[0][0];
+    var maxx = grid[0][1];
+    var posx = Math.floor(Math.random() * (+maxx - +minx)) + +minx;
+
+    var miny = grid[1][0];
+    var maxy = grid[1][1];
+    console.log("posx0----",posx);
+    console.log("posy0----",posy);
+    var posy = Math.floor(Math.random() * (+maxy - +miny)) + +miny;
+    if(posy >139 && posy< 739){
+      if(posy<=500)
+         posy = Math.floor(Math.random() * (+139 - +0)) + +0;
+      else
+        posy = Math.floor(Math.random() * (+940 - +738)) + +738;
+    }
+  
+    if((posx+divsize)>=screen_width){
+       posx = screen_width-divsize-70;
+    }
+    if((posy+divsize)>=screen_height){
+      posy = Math.floor(Math.random() * (+940 - +738)) + +738;
+    }
+
+    console.log("posx2----",posx);
+    console.log("posy2----",posy);
+    //var margin_left = Math.floor(Math.random() * ((screen_width-350) - 10 + 1)) + 10;
+    //var margin_top = Math.floor(Math.random() * ((screen_height-420) - 50 + 1)) + 50;
+
+    var img_position = 0;
+    if(last_img_position==0){
+       img_position = 0; last_img_position=1;
+     }else if(last_img_position==1){
+        img_position = 1; last_img_position=2;
+     }else if(last_img_position==2){
+        img_position = 2; last_img_position=3;
+     }else if(last_img_position==3){
+        img_position = 3; last_img_position=4;
+     }else if(last_img_position==4){
+        img_position = 4; last_img_position=0;
+     }
+
+    var top_div = document.createElement('div');
+    top_div.setAttribute("id", "div"+arr_list.length);
+    top_div.className = "hvr-bounce-in";
+    top_div.style.backgroundImage = "url('"+bg_images[img_position]+"')";
+    top_div.style.backgroundRepeat = "no-repeat";
+    top_div.style.backgroundSize = "100% 100%";
+    top_div.style.width = divsize+"px";
+    top_div.style.height = divsize+"px";
+    top_div.style.left = posx+"px";
+    top_div.style.top = posy+"px";
+    top_div.style.position = "absolute";
+    top_div.style.textAlign = "center";
+
+    var img = document.createElement('img');
+    img.src = "data:image/png;base64,"+last_obj.image;
+    img.style.width = "80px";
+    img.style.marginTop = "41px";
+    img.style.height = "70px";
+    img.style.borderRadius = "50%";
+    top_div.appendChild(img);
+
+    var br = document.createElement('br');
+    top_div.appendChild(br);
+
+    var label = document.createElement('label');
+    label.innerHTML = last_obj.message;
+    label.style.color = "blue";
+    label.style.fontFamily = "sans-serif";
+    top_div.appendChild(label);
+
+    document.getElementById('feedback_div').appendChild(top_div);
+
+    setTimeout(function() {
+        top_div.className = top_div.className + " show";
+        setTimeout(function() {
+            top_div.className = top_div.className;
+          }, 200);
+      }, 10);
+
+  }
+}, 1000);
+
+</script>
